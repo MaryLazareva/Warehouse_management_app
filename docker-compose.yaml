@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  test_fastapi_app:
+    container_name: test_fastapi_app
+    build:
+      context: .
+      dockerfile: app/Dockerfile
+    depends_on:
+      - warehouse_db
+    ports:
+      - "9000:8000"
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - DATABASE_URL=postgresql://postgres:123456@warehouse_db:5432/warehouse_db
+
+  warehouse_db:
+    container_name: warehouse_postgres
+    image: postgres
+    environment:
+      - POSTGRES_DB=warehouse_db
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    volumes:
+      - warehouse_db_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    restart: always
+
+volumes:
+  warehouse_db_data:
+
